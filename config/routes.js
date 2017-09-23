@@ -38,6 +38,11 @@ export default [
     path: '/api/v1/stats/repo',
     handler: 'StatsController.repo'
   },
+  {
+    method: 'GET',
+    path: '/api/v1/stats/profile',
+    handler: 'StatsController.profile'
+  },
 
   /**
    * GitHub Routes

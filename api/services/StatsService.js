@@ -1,13 +1,25 @@
 import Service from 'trails/service';
 
 export default class StatsService extends Service {
-  repo({ profileName, repoName }) {
+  repo({ profileLogin, repoName }) {
+    const s = this.app.services;
+    return s.ProfileService.getId({ login: profileLogin }).then((profileId) => {
+      return s.RepoService.findOne({
+        payload: { name: repoName, owner: profileId },
+        populate: ['owner']
+      }).then((repo) => {
+        return repo;
+      });
+    });
+  }
+
+  profile({ profileLogin }) {
     const s = this.app.services;
     return s.ProfileService.findOne({
-      payload: { name: profileName },
+      payload: { login: profileLogin },
       populate: ['repos']
-    }).then((repo) => {
-      return repo;
+    }).then((profile) => {
+      return profile;
     });
   }
 }

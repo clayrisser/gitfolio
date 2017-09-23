@@ -11,43 +11,59 @@ export default class Profile extends Model {
       },
       name: {
         type: 'string',
-        required: true
+        defaultsTo: ''
       },
       avatar: {
         type: 'string',
-        required: true
+        defaultsTo: ''
       },
       location: {
         type: 'string',
-        required: true
+        defaultsTo: ''
       },
       hireable: {
         type: 'boolean',
-        required: true
+        defaultsTo: false
       },
       bio: {
         type: 'string',
-        required: true
+        defaultsTo: ''
       },
       publicRepos: {
         type: 'integer',
-        required: true
+        defaultsTo: false
       },
       publicGists: {
         type: 'integer',
-        required: true
+        defaultsTo: false
       },
       followers: {
         type: 'integer',
-        required: true
+        defaultsTo: false
       },
       following: {
         type: 'integer',
-        required: true
+        defaultsTo: false
       },
       repos: {
         collection: 'Repo',
         via: 'owner'
+      },
+      totalStars: {
+        type: 'integer',
+        defaultsTo: 0
+      },
+      totalForks: {
+        type: 'integer',
+        defaultsTo: 0
+      },
+      totalWatchers: {
+        type: 'integer',
+        defaultsTo: 0
+      },
+      totalSubscribers: {
+        type: 'integer',
+        defaultsTo: 0
       }
     };
   }

@@ -19,16 +19,56 @@ export default class GithubService extends Service {
         followers: profileData.followers,
         following: profileData.following
       }).then((profile) => {
+        let totalStars = 0;
+        let totalForks = 0;
+        let totalWatchers = 0;
+        let totalSubscribers = 0;
         return this.getGithubRepos({ profileName }).then((reposData) => {
           const promises = _.map(reposData, (repoData) => {
+            totalStars += repoData.stargazers_count;
+            totalForks += repoData.forks;
+            totalWatchers += repoData.watchersCount;
+            totalSubscribers += repoData.subscribers_count;
             return s.RepoService.createOrUpdate({
-              payload: { name: repoData.name },
+              payload: {
+                name: repoData.name,
+                homepage: repoData.homepage,
+                size: repoData.size,
+                stargazersCount: repoData.stargazers_count,
+                watchersCount: repoData.watchers_count,
+                language: repoData.language,
+                hasIssues: repoData.has_issues,
+                hasProjects: repoData.has_projects,
+                hasDownloads: repoData.has_downloads,
+                hasWiki: repoData.has_wiki,
+                hasPages: repoData.has_pages,
+                forksCount: repoData.forks_count,
+                mirrorUrl: repoData.mirror_url,
+                openIssuesCount: repoData.open_issues_count,
+                forks: repoData.forks,
+                openIssues: repoData.open_issues,
+                watchers: repoData.watchers,
+                defaultBranch: repoData.default_branch,
+                networkCount: repoData.network_count,
+                subscribersCount: repoData.subscribers_count
+              },
               profileId: profile.id
             });
           });
           return Promise.all(promises);
         }).then((repos) => {
-          return s.ProfileService.findOne({ payload: profile.id, populate: ['repos'] });
+          return new Promise((resolve, reject) => {
+            profile.totalStars = totalStars;
+            profile.totalForks = totalForks;
+            profile.totalWatchers = totalWatchers;
+            profile.totalSubscribers = totalSubscribers;
+            profile.save((err) => {
+              if (err) return reject(err);
+              return resolve(profile);
+            });
+          });
+        }).then((updatedProfile) => {
+          return s.ProfileService.findOne({ payload: updatedProfile.id, populate: ['repos'] });
         });
       });
     });
