@@ -18,21 +18,32 @@ export default class ProfileService extends Service {
 
   update({ payload, profileId }) {
     const o = this.app.orm;
-    if (!payload) throw boom.badRequest('Profile not specified', payload);
-    return o.Profile.update(profileId, payload).then((profile) => {
-      if (!profile) throw boom.badImplementation('Profile not updated');
+    return o.Profile.update(profileId, payload).then((profiles) => {
+      if (!profiles || profiles.length <= 0) throw boom.badImplementation('Profile not updated');
+      return profiles[0];
+    });
+  }
+
+  createOrUpdate(payload) {
+    return Promise.resolve().then(() => {
+      if (payload.id) return payload.id;
+      if (payload.login) {
+        return this.getId({ login: payload.login });
+      }
+      throw boom.badRequest('Profile not specified');
+    }).then((profileId) => {
+      if (!profileId) return this.create(payload);
+      return this.update({ payload, profileId });
     });
   }
 
   findOne({ payload, populate = [] }) {
     const o = this.app.orm;
-    if (!payload) throw boom.badRequest('Profile not specified', payload);
     let query = o.Profile.findOne(payload);
     _.each(populate, (toPopulate) => {
       query = query.populate(toPopulate);
     });
     return query.then((profile) => {
-      if (!profile) throw boom.notFound('Profile not found');
       return profile;
     });
   }
@@ -48,6 +59,6 @@ export default class ProfileService extends Service {
   }
 
   getId(payload) {
-    this.findOne({ payload }).then(profile => profile.id);
+    return this.findOne({ payload }).then(profile => (profile ? profile.id : null));
   }
 }

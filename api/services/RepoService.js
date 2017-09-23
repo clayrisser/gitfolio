@@ -8,9 +8,9 @@ export default class RepoService extends Service {
     const s = this.app.services;
     return o.Repo.create(payload).then((repo) => {
       if (!repo) throw boom.badImplementation('Repo not updated');
-      return s.Profile.findOne(profileId).then((profile) => {
+      return s.ProfileService.findOne({ payload: profileId }).then((profile) => {
         return new Promise((resolve, reject) => {
-          profile.repo.add(repo.id);
+          profile.repos.add(repo.id);
           profile.save((err) => {
             if (err) return reject(err);
             return resolve(profile);
@@ -25,6 +25,28 @@ export default class RepoService extends Service {
           });
         });
       });
+    });
+  }
+
+  update({ payload, repoId }) {
+    const o = this.app.orm;
+    if (!payload) throw boom.badRequest('Repo not specified');
+    return o.Repo.update(repoId, payload).then((repos) => {
+      if (!repos || repos.length <= 0) throw boom.badImplementation('Repo not updated');
+      return repos[0];
+    });
+  }
+
+  createOrUpdate({ payload, profileId }) {
+    return Promise.resolve().then(() => {
+      if (payload.id) return payload.id;
+      if (payload.name) {
+        return this.getId({ name: payload.name });
+      }
+      throw boom.badRequest('Repo not specified');
+    }).then((repoId) => {
+      if (!repoId) return this.create({ payload, profileId });
+      return this.update({ payload, repoId });
     });
   }
 
@@ -53,23 +75,13 @@ export default class RepoService extends Service {
     });
   }
 
-  update(payload) {
-    const o = this.app.orm;
-    if (!payload) throw boom.badRequest('Repo not specified');
-    return o.Repo.update(payload).then((repo) => {
-      if (!repo) throw boom.badImplementation('Repo not updated');
-    });
-  }
-
   findOne({ payload, populate = [] }) {
     const o = this.app.orm;
-    if (!payload) throw boom.badRequest('Repo not specified');
     let query = o.Repo.findOne(payload);
     _.each(populate, (toPopulate) => {
       query = query.populate(toPopulate);
     });
     return query.then((repo) => {
-      if (!repo) throw boom.notFound('Repo not found');
       return repo;
     });
   }
@@ -85,6 +97,6 @@ export default class RepoService extends Service {
   }
 
   getId(payload) {
-    this.findOne({ payload }).then(repo => repo.id);
+    return this.findOne({ payload }).then(repo => (repo ? repo.id : null));
   }
 }
