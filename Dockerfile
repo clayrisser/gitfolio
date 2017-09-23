@@ -1,5 +1,5 @@
 #############################################
-# Dockerfile to run trailblazer
+# Dockerfile to run jamrizzi/gitfolio:latest
 # Based on Alpine
 #############################################
 
@@ -19,15 +19,12 @@ WORKDIR /app/
 RUN apk add --no-cache \
         tini && \
     apk add --no-cache --virtual build-deps \
-        git && \
-    npm install -g eslint
+        git
 
 COPY ./package.json /app/
 RUN npm install
 COPY ./ /app/
-RUN npm test && \
-    apk del build-deps && \
-    npm uninstall -g eslint && \
+RUN apk del build-deps && \
     npm prune --production
 
 ENTRYPOINT ["/sbin/tini", "--", "node", "/app/node_modules/babel-cli/bin/babel-node", "/app/server.js"]

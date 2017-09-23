@@ -2,7 +2,7 @@
   "name": "gitfolio",
   "version": "v0.0.1",
   "description": "Get information about your github portfolio",
-  "homepage": "https://github.com/jamrizzi/trailblazer",
+  "homepage": "https://github.com/jamrizzi/gitfolio",
   "author": {
     "name": "Jam Risser",
     "email": "jam@jamrizzi.com",
@@ -51,18 +51,18 @@
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^6.0.2",
     "eslint-plugin-react": "^7.3.0",
-    "mocha": "^2.5",
+    "mocha": "^3.5.3",
     "nodemon": "^1.11.0",
     "supertest": "^1.2"
   },
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha --compilers js:babel-core/register",
     "start": "node ./node_modules/nodemon/bin/nodemon -e js -x 'npm run lint && node ./node_modules/babel-cli/bin/babel-node server.js || exit 1'",
-    "build": "docker build -t jamrizzi/trailblazer:latest -f ./Dockerfile .",
-    "push": "docker push -t jamrizzi/trailblazer:latest",
-    "run": "docker run --name some-trailblazer --rm --link some-mongo:db -p 3000:3000 jamrizzi/trailblazer:latest",
-    "ssh": "docker run --name some-trailblazer --rm -it --execute /bin/sh jamrizzi/trailblaser:latest",
-    "essh": "docker exec -it some-trailblazer /bin/sh",
+    "build": "docker build -t jamrizzi/gitfolio:latest -f ./Dockerfile .",
+    "push": "docker push jamrizzi/gitfolio:latest",
+    "run": "docker run --name some-gitfolio --rm --link some-mongo:db -p 3000:3000 jamrizzi/gitfolio:latest",
+    "ssh": "docker run --name some-gitfolio --rm -it --execute /bin/sh jamrizzi/trailblaser:latest",
+    "essh": "docker exec -it some-gitfolio /bin/sh",
     "data": "docker run --name some-mongo --rm -p 27017:27017 mongo:latest",
     "lint": "node ./node_modules/eslint/bin/eslint ./api ./config"
   },
